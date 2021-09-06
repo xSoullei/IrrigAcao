@@ -1,0 +1,46 @@
+function doGet(e) { 
+  Logger.log( JSON.stringify(e) );  // Vê parâmetros
+  var result = 'Ok'; // Acesso permitido
+  if (e.parameter == 'undefined') {
+    result = 'No Parameters';
+  }
+  else {
+    var sheet_id = '1JG1XdvX84tP80xzn0eiu5SbgmI6cyp_ZanA7oT3ZDQc'; 		// ID da Planilha
+    var sheet = SpreadsheetApp.openById(sheet_id).getActiveSheet();		// Get Planilha atual
+    var newRow = sheet.getLastRow() + 1;						
+    var rowData = [];
+    d=new Date();
+    rowData[0] = d; // Insire a data na primeira coluna
+    rowData[1] = d.toLocaleTimeString(); // Insere a hora na segunda coluna
+    
+    for (var param in e.parameter) {
+      Logger.log('In for loop, param=' + param);
+      var value = stripQuotes(e.parameter[param]);
+      Logger.log(param + ':' + e.parameter[param]);
+      switch (param) {
+        case 'value1': //Parâmetro 1 (Verifique o nome no código)
+          rowData[2] = value; //Insire na terceira coluna
+          result = 'Escrito na tercecira coluna';
+          break;
+        case 'value2': //Parâmetro 2 (Verifique o nome no código)
+          rowData[3] = value; //Insire na quarta colunna
+          result += ' Escrito na quarta coluna';
+          break;
+        case 'value3': //Parâmetro 3 (Verifique o nome no código)
+          rowData[4] = value; //Insere na quinta coluna
+          result += ' Escrito na quinta coluna';
+          break;
+        default:
+          result = "Parâmetro não suportado";
+      }
+    }
+    Logger.log(JSON.stringify(rowData));
+    // Write new row below
+    var newRange = sheet.getRange(newRow, 1, 1, rowData.length);
+    newRange.setValues([rowData]);
+  }
+  // Return result of operation
+  return ContentService.createTextOutput(result);
+}
+function stripQuotes( value ) {
+  return value.replace(/^["']|['"]$/g, "");
